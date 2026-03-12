@@ -142,6 +142,7 @@
         #scan {
             background: linear-gradient(180deg, #0f0520 0%, #1a0a2e 50%, #0f0520 100%);
             padding: 80px 40px;
+            flex-direction: column;
         }
 
         .scan-header {
@@ -168,6 +169,7 @@
 
         .bars-container {
             max-width: 700px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -426,6 +428,7 @@
         #quiz {
             background: linear-gradient(180deg, #1a0f2e 0%, #0f0520 50%, #1a0f2e 100%);
             padding: 80px 40px;
+            flex-direction: column;
         }
 
         .quiz-header {
@@ -452,6 +455,7 @@
 
         .quiz-container {
             max-width: 600px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -654,6 +658,8 @@
             line-height: 1.8;
             font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
             transition: opacity 0.6s ease;
+            word-break: break-word;
+            overflow-wrap: break-word;
         }
 
         .verdict-extra.visible {
@@ -694,6 +700,8 @@
             padding-bottom: calc(80px + env(safe-area-inset-bottom));
             padding-left: calc(40px + env(safe-area-inset-left));
             padding-right: calc(40px + env(safe-area-inset-right));
+            flex-direction: column;
+            justify-content: flex-start;
         }
 
         .gallery-header {
@@ -723,6 +731,7 @@
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 30px;
             max-width: 1200px;
+            width: 100%;
             margin: 0 auto;
         }
 
@@ -972,9 +981,15 @@
             }
 
             .verdict-extra {
-                font-size: 12px;
+                font-size: 13px;
                 margin-top: 25px;
-                padding: 0 15px;
+                padding: 0 10px;
+                max-width: 100%;
+                line-height: 1.6;
+            }
+
+            .verdict-extra .scramble-char {
+                min-width: 0;
             }
 
             .floating-text {
