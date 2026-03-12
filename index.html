@@ -702,6 +702,8 @@
             padding-right: calc(40px + env(safe-area-inset-right));
             flex-direction: column;
             justify-content: flex-start;
+            align-items: center;
+            min-height: auto;
         }
 
         .gallery-header {
@@ -885,8 +887,12 @@
             }
 
             .gallery-grid {
-                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                gap: 20px;
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+
+            .gallery-header {
+                margin-bottom: 40px;
             }
 
             .star-modal {
@@ -981,15 +987,17 @@
             }
 
             .verdict-extra {
-                font-size: 13px;
-                margin-top: 25px;
-                padding: 0 10px;
+                font-size: 11px;
+                margin-top: 20px;
+                padding: 0 5px;
                 max-width: 100%;
-                line-height: 1.6;
+                line-height: 1.5;
+                text-align: center;
             }
 
             .verdict-extra .scramble-char {
                 min-width: 0;
+                display: inline;
             }
 
             .floating-text {
@@ -997,13 +1005,13 @@
             }
 
             #starfield {
-                padding: 60px 15px;
-                min-height: 80vh;
-                min-height: 80dvh;
+                padding: 40px 10px;
+                min-height: 100vh;
+                min-height: 100dvh;
             }
 
             .starfield-header {
-                margin-bottom: 60px;
+                margin-bottom: 30px;
             }
 
             .star-modal {
@@ -1027,20 +1035,32 @@
 
             .gallery-grid {
                 grid-template-columns: repeat(2, 1fr);
-                gap: 12px;
+                gap: 10px;
                 padding: 0;
+                width: 100%;
             }
 
             .gallery-card {
                 border-radius: 8px;
+                aspect-ratio: 3/4;
+                min-height: 0;
             }
 
             .gallery-description {
-                font-size: 13px;
+                font-size: 11px;
+            }
+
+            .gallery-label {
+                font-size: 10px;
+                margin-bottom: 4px;
             }
 
             .gallery-icon {
-                font-size: 24px;
+                font-size: 20px;
+            }
+
+            .gallery-card-overlay {
+                padding: 10px;
             }
         }
     </style>
@@ -1299,24 +1319,24 @@
         // Place stars in a deliberate grid pattern with some randomness
         // so they're spaced out and never overlap the header text
         const isMobile = w < 768;
-        const titleZoneBottom = isMobile ? h * 0.38 : h * 0.25;
-        const bottomPadding = isMobile ? 40 : 80;
-        const sidePadding = isMobile ? 30 : 60;
+        const titleZoneBottom = isMobile ? h * 0.52 : h * 0.25;
+        const bottomPadding = isMobile ? 30 : 80;
+        const sidePadding = isMobile ? 20 : 60;
         const usableW = w - sidePadding * 2;
         const usableH = h - titleZoneBottom - bottomPadding;
         const count = starData.length; // 7 stars
 
         // Layout: 3 columns, spread across rows below the title
-        // On mobile, rows are pushed further apart to avoid title overlap
+        // On mobile, stars are pushed well below the title into lower half
         const positions = isMobile ? [
-            // Mobile: spread stars across more vertical space, away from title
-            { col: 0.2,  row: 0.0 },
-            { col: 0.8,  row: 0.05 },
-            { col: 0.5,  row: 0.2 },
-            { col: 0.15, row: 0.42 },
-            { col: 0.85, row: 0.4 },
-            { col: 0.3,  row: 0.65 },
-            { col: 0.7,  row: 0.7 },
+            // Mobile: stars in bottom half only, well clear of title
+            { col: 0.15, row: 0.0 },
+            { col: 0.85, row: 0.05 },
+            { col: 0.5,  row: 0.15 },
+            { col: 0.1,  row: 0.38 },
+            { col: 0.9,  row: 0.35 },
+            { col: 0.35, row: 0.6 },
+            { col: 0.7,  row: 0.65 },
         ] : [
             // Row 1: 3 stars spread wide
             { col: 0.15, row: 0.1 },
@@ -1335,14 +1355,14 @@
         starData.forEach((data, index) => {
             const pos = positions[index];
             // Add a little random jitter so it doesn't look too perfect
-            const jitterX = (Math.random() - 0.5) * 40;
-            const jitterY = (Math.random() - 0.5) * 30;
+            const jitterX = isMobile ? (Math.random() - 0.5) * 20 : (Math.random() - 0.5) * 40;
+            const jitterY = isMobile ? (Math.random() - 0.5) * 15 : (Math.random() - 0.5) * 30;
             const x = sidePadding + pos.col * usableW + jitterX;
             const y = titleZoneBottom + pos.row * usableH + jitterY;
-            const radius = 9 + Math.random() * 3;
+            const radius = isMobile ? 12 + Math.random() * 4 : 9 + Math.random() * 3;
             stars.push({
                 x, y, radius, color: colors[index % 7], data,
-                pulsePhase: Math.random() * Math.PI * 2, clickRadius: isMobile ? 50 : 35
+                pulsePhase: Math.random() * Math.PI * 2, clickRadius: isMobile ? 60 : 35
             });
         });
     }
@@ -1649,13 +1669,34 @@
                                     verdictSubtitle.classList.add('visible');
                                 }, 300);
 
-                                // Phase 4: Scramble in the extra text
+                                // Phase 4: Scramble in the extra text (two lines on mobile)
                                 setTimeout(() => {
                                     verdictExtra.classList.add('visible');
-                                    scrambleText(verdictExtra, "Don't say it... don't say... mother fucking Berfect", {
-                                        speed: 18,
-                                        delay: 0
-                                    });
+                                    const isMobileView = window.innerWidth < 768;
+                                    if (isMobileView) {
+                                        // Split into two lines for mobile
+                                        verdictExtra.innerHTML = '';
+                                        const line1 = document.createElement('div');
+                                        const line2 = document.createElement('div');
+                                        line2.style.marginTop = '8px';
+                                        verdictExtra.appendChild(line1);
+                                        verdictExtra.appendChild(line2);
+                                        scrambleText(line1, "Don't say it... don't say...", {
+                                            speed: 18,
+                                            delay: 0,
+                                            onComplete: () => {
+                                                scrambleText(line2, "mother fucking Berfect", {
+                                                    speed: 18,
+                                                    delay: 200
+                                                });
+                                            }
+                                        });
+                                    } else {
+                                        scrambleText(verdictExtra, "Don't say it... don't say... mother fucking Berfect", {
+                                            speed: 18,
+                                            delay: 0
+                                        });
+                                    }
                                 }, 1200);
                             }
                         });
