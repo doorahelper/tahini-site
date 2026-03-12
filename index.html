@@ -1,0 +1,1738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#0a0a1a">
+    <title>Tahini - Beauty Validation System</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --blush-pink: #F4A0B0;
+            --dusty-rose: #E8849A;
+            --sage-green: #B5C99A;
+            --ocean-teal: #5BB5C6;
+            --sunset-gold: #F4A460;
+            --cream: #FFF8F0;
+            --neon-pink: #ff6b9d;
+            --dark-bg: #0a0a1a;
+            --warm-brown: #8B6F47;
+        }
+
+        html {
+            scroll-behavior: smooth;
+            overscroll-behavior: none;
+        }
+
+        body {
+            font-family: -apple-system, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #0a0a1a 0%, #1a0f2e 50%, #0a0a1a 100%);
+            color: #f5f5f5;
+            overflow-x: hidden;
+            -webkit-text-size-adjust: 100%;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        /* ============ SECTION 1: BOOT SEQUENCE ============ */
+        section {
+            width: 100%;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        #boot {
+            background: linear-gradient(180deg, #0a0a1a 0%, #1a0a2e 100%);
+            border-top: 2px solid var(--neon-pink);
+            border-bottom: 2px solid var(--neon-pink);
+            padding-top: env(safe-area-inset-top);
+        }
+
+        .boot-container {
+            max-width: 800px;
+            width: 90%;
+            padding: 60px 40px;
+            border: 2px solid var(--neon-pink);
+            border-radius: 8px;
+            background: rgba(20, 10, 30, 0.8);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 0 60px rgba(255, 107, 157, 0.3), inset 0 0 20px rgba(255, 107, 157, 0.1);
+        }
+
+        .terminal {
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            color: var(--neon-pink);
+            text-shadow: 0 0 10px rgba(255, 107, 157, 0.5);
+            min-height: 300px;
+        }
+
+        .terminal-line {
+            opacity: 0;
+            animation: appear 0.05s forwards;
+        }
+
+        @keyframes appear {
+            to { opacity: 1; }
+        }
+
+        .cursor {
+            display: inline-block;
+            width: 10px;
+            height: 1.2em;
+            background: var(--neon-pink);
+            margin-left: 4px;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 49% { opacity: 1; }
+            50%, 100% { opacity: 0; }
+        }
+
+        .begin-btn {
+            margin-top: 40px;
+            padding: 16px 40px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--blush-pink));
+            border: none;
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 0 30px rgba(255, 107, 157, 0.4);
+            animation: pulse-glow 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% {
+                box-shadow: 0 0 30px rgba(255, 107, 157, 0.4);
+                transform: scale(1);
+            }
+            50% {
+                box-shadow: 0 0 50px rgba(255, 107, 157, 0.8);
+                transform: scale(1.05);
+            }
+        }
+
+        .begin-btn:hover {
+            background: linear-gradient(135deg, var(--blush-pink), var(--neon-pink));
+            box-shadow: 0 0 60px rgba(255, 107, 157, 0.8);
+        }
+
+        .begin-btn:active {
+            transform: scale(0.95);
+        }
+
+        /* ============ SECTION 2: SCAN RESULTS ============ */
+        #scan {
+            background: linear-gradient(180deg, #0f0520 0%, #1a0a2e 50%, #0f0520 100%);
+            padding: 80px 40px;
+        }
+
+        .scan-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .scan-header h2 {
+            font-size: 32px;
+            margin-bottom: 10px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--sunset-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .scan-subtitle {
+            color: var(--blush-pink);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .bars-container {
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .bar-item {
+            margin-bottom: 50px;
+            opacity: 0;
+            animation: fade-in 0.6s ease forwards;
+        }
+
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bar-item.visible {
+            animation: fade-in 0.6s ease forwards;
+        }
+
+        .bar-label {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            font-weight: 600;
+        }
+
+        .bar-label span {
+            color: var(--cream);
+            font-size: 16px;
+        }
+
+        .bar-percentage {
+            font-size: 20px;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--sunset-gold), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .bar-bg {
+            width: 100%;
+            height: 12px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 100px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        .bar-fill {
+            height: 100%;
+            width: 0%;
+            border-radius: 100px;
+            background: linear-gradient(90deg, var(--sunset-gold), var(--blush-pink));
+            transition: width 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.5);
+        }
+
+        .bar-item.visible .bar-fill {
+            width: var(--fill-value);
+        }
+
+        .bar-subtitle {
+            margin-top: 8px;
+            font-size: 13px;
+            color: rgba(255, 248, 240, 0.7);
+            font-style: italic;
+        }
+
+        /* Floating particles */
+        .particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+            pointer-events: none;
+        }
+
+        .particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: radial-gradient(circle, var(--blush-pink), transparent);
+            border-radius: 50%;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0) scale(1); opacity: 0.5; }
+            50% { transform: translateY(-30px) translateX(20px) scale(0.5); opacity: 0.8; }
+        }
+
+        /* ============ SECTION 3: STARFIELD ============ */
+        #starfield {
+            background: #0a0a1a;
+            position: relative;
+            padding: 80px 40px;
+            min-height: 100vh;
+            min-height: 100dvh;
+        }
+
+        #starCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            touch-action: manipulation;
+        }
+
+        .starfield-content {
+            position: relative;
+            z-index: 10;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        .starfield-header {
+            text-align: center;
+            margin-bottom: 100px;
+        }
+
+        .starfield-header h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--ocean-teal));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .starfield-subtitle {
+            color: var(--dusty-rose);
+            font-size: 16px;
+            font-style: italic;
+            opacity: 0.8;
+        }
+
+        .clickable-star {
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .clickable-star:hover {
+            filter: brightness(1.5);
+        }
+
+        /* Modal/Card */
+        .star-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8);
+            z-index: 1000;
+            background: linear-gradient(135deg, rgba(244, 160, 176, 0.15) 0%, rgba(91, 181, 198, 0.15) 100%);
+            -webkit-backdrop-filter: blur(20px);
+            backdrop-filter: blur(20px);
+            border: 2px solid var(--neon-pink);
+            border-radius: 16px;
+            padding: 50px;
+            max-width: 500px;
+            width: 90%;
+            box-shadow: 0 20px 80px rgba(255, 107, 157, 0.3);
+            opacity: 0;
+            animation: modal-appear 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            pointer-events: auto;
+        }
+
+        @keyframes modal-appear {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .star-modal.hidden {
+            opacity: 0;
+            pointer-events: none;
+            animation: modal-disappear 0.3s ease forwards;
+        }
+
+        @keyframes modal-disappear {
+            to {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(0.5);
+            }
+        }
+
+        .star-modal h3 {
+            font-size: 24px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--sunset-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+        }
+
+        .star-modal p {
+            font-size: 16px;
+            line-height: 1.6;
+            color: var(--cream);
+            margin-bottom: 20px;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: none;
+            border: none;
+            color: var(--blush-pink);
+            font-size: 28px;
+            cursor: pointer;
+            opacity: 0.7;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-close:hover {
+            opacity: 1;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            width: 100%;
+            height: 100%;
+            height: 100dvh;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        /* ============ SECTION 4: QUIZ ============ */
+        #quiz {
+            background: linear-gradient(180deg, #1a0f2e 0%, #0f0520 50%, #1a0f2e 100%);
+            padding: 80px 40px;
+        }
+
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .quiz-header h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--ocean-teal), var(--neon-pink));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .quiz-subtitle {
+            color: var(--dusty-rose);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .quiz-container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .question-card {
+            background: linear-gradient(135deg, rgba(244, 160, 176, 0.1) 0%, rgba(91, 181, 198, 0.1) 100%);
+            border: 2px solid var(--neon-pink);
+            border-radius: 12px;
+            padding: 40px;
+            min-height: 400px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            opacity: 0;
+            animation: question-appear 0.6s ease forwards;
+        }
+
+        @keyframes question-appear {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .question-card.hidden {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        .question-number {
+            color: var(--sunset-gold);
+            font-size: 14px;
+            margin-bottom: 10px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .question-text {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 30px;
+            color: var(--cream);
+            line-height: 1.4;
+        }
+
+        .answers {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .answer-btn {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, rgba(244, 160, 176, 0.2), rgba(91, 181, 198, 0.2));
+            border: 2px solid var(--blush-pink);
+            color: var(--cream);
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            text-align: left;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .answer-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle, rgba(255, 107, 157, 0.4), transparent);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .answer-btn:hover {
+            background: linear-gradient(135deg, rgba(244, 160, 176, 0.4), rgba(91, 181, 198, 0.4));
+            border-color: var(--neon-pink);
+            box-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .answer-btn:active::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .result-text {
+            text-align: center;
+            font-size: 18px;
+            color: var(--blush-pink);
+            margin: 20px 0;
+            min-height: 30px;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        .result-text.typing {
+            animation: none;
+        }
+
+        /* ============ SECTION 5: FINAL VERDICT ============ */
+        #verdict {
+            background: linear-gradient(180deg, var(--blush-pink) 0%, var(--sunset-gold) 50%, var(--ocean-teal) 100%);
+            position: relative;
+            padding: 0;
+            min-height: 100vh;
+            min-height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .verdict-particles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            overflow: hidden;
+        }
+
+        .verdict-content {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+        }
+
+        .verdict-label {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            margin-bottom: 30px;
+            opacity: 0;
+            letter-spacing: 2px;
+            min-height: 1.5em;
+        }
+
+        .verdict-label.visible {
+            opacity: 1;
+        }
+
+        .verdict-result {
+            font-size: 120px;
+            font-weight: 900;
+            color: white;
+            text-shadow: 0 0 60px rgba(255, 107, 157, 0.8), 0 0 100px rgba(255, 107, 157, 0.4);
+            margin: 20px 0;
+            letter-spacing: -2px;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            min-height: 1.2em;
+            opacity: 1;
+        }
+
+        .verdict-result .scramble-char {
+            display: inline-block;
+            min-width: 0.08em;
+            transition: color 0.1s ease;
+        }
+
+        .verdict-result .scramble-char.random {
+            color: rgba(255, 255, 255, 0.4);
+            text-shadow: 0 0 20px rgba(255, 107, 157, 0.3);
+        }
+
+        .verdict-result .scramble-char.revealed {
+            color: white;
+            text-shadow: 0 0 60px rgba(255, 107, 157, 0.8), 0 0 100px rgba(255, 107, 157, 0.4);
+        }
+
+        .verdict-result .scramble-char.cursor-char {
+            color: var(--neon-pink);
+            text-shadow: 0 0 30px rgba(255, 107, 157, 1);
+        }
+
+        .verdict-subtitle {
+            font-size: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            margin-top: 20px;
+            opacity: 0;
+            font-style: italic;
+            font-weight: 300;
+            letter-spacing: 1px;
+            transition: opacity 0.6s ease;
+        }
+
+        .verdict-subtitle.visible {
+            opacity: 1;
+        }
+
+        .verdict-extra {
+            margin-top: 60px;
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            opacity: 0;
+            max-width: 600px;
+            line-height: 1.8;
+            font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+            transition: opacity 0.6s ease;
+        }
+
+        .verdict-extra.visible {
+            opacity: 1;
+        }
+
+        .floating-text {
+            position: absolute;
+            font-size: 18px;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            opacity: 0;
+            animation: drift 8s ease-in-out infinite;
+            pointer-events: none;
+        }
+
+        @keyframes drift {
+            0% {
+                opacity: 0;
+                transform: translateX(-100px) translateY(0);
+            }
+            20% {
+                opacity: 0.8;
+            }
+            80% {
+                opacity: 0.8;
+            }
+            100% {
+                opacity: 0;
+                transform: translateX(calc(100vw + 100px)) translateY(100px);
+            }
+        }
+
+        /* ============ SECTION 6: GALLERY ============ */
+        #gallery {
+            background: linear-gradient(180deg, #0f0520 0%, #1a0a2e 100%);
+            padding: 80px 40px;
+            padding-bottom: calc(80px + env(safe-area-inset-bottom));
+            padding-left: calc(40px + env(safe-area-inset-left));
+            padding-right: calc(40px + env(safe-area-inset-right));
+        }
+
+        .gallery-header {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .gallery-header h2 {
+            font-size: 36px;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, var(--neon-pink), var(--sunset-gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: 700;
+            letter-spacing: 2px;
+        }
+
+        .gallery-subtitle {
+            color: var(--ocean-teal);
+            font-size: 14px;
+            opacity: 0.8;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 30px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .gallery-card {
+            aspect-ratio: 3/4;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            border: 2px solid rgba(255, 248, 240, 0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            animation: card-appear 0.6s ease forwards;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .gallery-card.has-image {
+            border: 2px solid rgba(255, 248, 240, 0.1);
+        }
+
+        .gallery-card.has-image .gallery-card-overlay {
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            background: linear-gradient(180deg, transparent 0%, rgba(10, 10, 26, 0.85) 100%);
+        }
+
+        .gallery-card.has-image:hover .gallery-card-overlay {
+            opacity: 1;
+        }
+
+        .gallery-card.has-image .gallery-card-overlay .gallery-label,
+        .gallery-card.has-image .gallery-card-overlay .gallery-description {
+            transform: translateY(10px);
+            transition: transform 0.3s ease;
+        }
+
+        .gallery-card.has-image:hover .gallery-card-overlay .gallery-label,
+        .gallery-card.has-image:hover .gallery-card-overlay .gallery-description {
+            transform: translateY(0);
+        }
+
+        @keyframes card-appear {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .gallery-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--neon-pink);
+            box-shadow: 0 20px 40px rgba(255, 107, 157, 0.2);
+        }
+
+        .gallery-card-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(180deg, transparent 30%, rgba(10, 10, 26, 0.7) 100%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-end;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .gallery-label {
+            font-size: 14px;
+            color: var(--neon-pink);
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 10px;
+        }
+
+        .gallery-description {
+            font-size: 16px;
+            color: var(--cream);
+            font-weight: 500;
+            margin-bottom: 15px;
+        }
+
+        .gallery-icon {
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .gallery-add {
+            font-size: 12px;
+            color: rgba(255, 248, 240, 0.6);
+            font-style: italic;
+        }
+
+        /* ============ TOUCH DEVICE FIXES ============ */
+        @media (hover: none) and (pointer: coarse) {
+            .gallery-card.has-image .gallery-card-overlay {
+                opacity: 1;
+                background: linear-gradient(180deg, transparent 40%, rgba(10, 10, 26, 0.85) 100%);
+            }
+
+            .gallery-card.has-image .gallery-card-overlay .gallery-label,
+            .gallery-card.has-image .gallery-card-overlay .gallery-description {
+                transform: translateY(0);
+            }
+
+            .gallery-card:hover {
+                transform: none;
+            }
+
+            .gallery-card:active {
+                transform: scale(0.98);
+            }
+        }
+
+        /* ============ RESPONSIVE ============ */
+        @media (max-width: 768px) {
+            .boot-container {
+                padding: 40px 20px;
+            }
+
+            .terminal {
+                font-size: 12px;
+            }
+
+            .scan-header h2 {
+                font-size: 24px;
+            }
+
+            .starfield-header h2,
+            .quiz-header h2,
+            .gallery-header h2 {
+                font-size: 28px;
+            }
+
+            .question-text {
+                font-size: 20px;
+            }
+
+            .verdict-result {
+                font-size: 72px;
+            }
+
+            .verdict-subtitle {
+                font-size: 16px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                gap: 20px;
+            }
+
+            .star-modal {
+                padding: 30px;
+                max-width: 90%;
+            }
+
+            .star-modal h3 {
+                font-size: 20px;
+            }
+
+            .star-modal p {
+                font-size: 14px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .boot-container {
+                padding: 30px 15px;
+                border-radius: 4px;
+            }
+
+            .terminal {
+                font-size: 11px;
+                line-height: 1.6;
+            }
+
+            .begin-btn {
+                padding: 12px 30px;
+                font-size: 14px;
+            }
+
+            #scan {
+                padding: 60px 20px;
+            }
+
+            #quiz {
+                padding: 60px 20px;
+            }
+
+            #gallery {
+                padding: 60px 15px;
+                padding-bottom: calc(60px + env(safe-area-inset-bottom));
+            }
+
+            .scan-header h2 {
+                font-size: 20px;
+            }
+
+            .bar-label {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .bar-percentage {
+                margin-top: 6px;
+            }
+
+            .starfield-header h2,
+            .quiz-header h2,
+            .gallery-header h2 {
+                font-size: 22px;
+            }
+
+            .starfield-subtitle,
+            .quiz-subtitle,
+            .gallery-subtitle {
+                font-size: 12px;
+            }
+
+            .question-card {
+                padding: 25px;
+                min-height: auto;
+            }
+
+            .question-text {
+                font-size: 18px;
+            }
+
+            .answer-btn {
+                padding: 12px 15px;
+                font-size: 13px;
+            }
+
+            .verdict-result {
+                font-size: 48px;
+                letter-spacing: -1px;
+            }
+
+            .verdict-subtitle {
+                font-size: 14px;
+            }
+
+            .verdict-extra {
+                font-size: 12px;
+                margin-top: 25px;
+                padding: 0 15px;
+            }
+
+            .floating-text {
+                font-size: 13px;
+            }
+
+            #starfield {
+                padding: 60px 15px;
+                min-height: 80vh;
+                min-height: 80dvh;
+            }
+
+            .starfield-header {
+                margin-bottom: 60px;
+            }
+
+            .star-modal {
+                padding: 25px;
+                max-width: 92%;
+                margin: auto;
+                max-height: 80vh;
+                max-height: 80dvh;
+                overflow-y: auto;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            #verdict {
+                padding: 40px calc(15px + env(safe-area-inset-left)) 40px calc(15px + env(safe-area-inset-right));
+            }
+
+            .verdict-label {
+                font-size: 13px;
+                letter-spacing: 1px;
+            }
+
+            .gallery-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 12px;
+                padding: 0;
+            }
+
+            .gallery-card {
+                border-radius: 8px;
+            }
+
+            .gallery-description {
+                font-size: 13px;
+            }
+
+            .gallery-icon {
+                font-size: 24px;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- SECTION 1: BOOT SEQUENCE -->
+<section id="boot">
+    <div class="boot-container">
+        <div class="terminal">
+            <div id="terminalContent"></div>
+            <span id="cursor" class="cursor"></span>
+        </div>
+        <button class="begin-btn" id="beginBtn" style="display: none;">BEGIN SCAN</button>
+    </div>
+</section>
+
+<!-- SECTION 2: SCAN RESULTS -->
+<section id="scan">
+    <div class="particles" id="scanParticles"></div>
+    <div class="scan-header">
+        <h2>SCAN RESULTS // SUBJECT: TAHINI</h2>
+        <p class="scan-subtitle">Inner beauty validation in progress...</p>
+    </div>
+    <div class="bars-container">
+        <div class="bar-item" data-fill="100">
+            <div class="bar-label">
+                <span>Humor Level</span>
+                <span class="bar-percentage">1000%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 100%;"></div></div>
+            <div class="bar-subtitle">Captions completely unrelated to photos. Genius.</div>
+        </div>
+
+        <div class="bar-item" data-fill="1">
+            <div class="bar-label">
+                <span>Food Obsession</span>
+                <span class="bar-percentage">1%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 1%;"></div></div>
+            <div class="bar-subtitle">Sourdough. Protein bread. Brioche. It never ends.</div>
+        </div>
+
+        <div class="bar-item" data-fill="100">
+            <div class="bar-label">
+                <span>Shenanigans Capacity</span>
+                <span class="bar-percentage">101%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 100%;"></div></div>
+            <div class="bar-subtitle">Pole climbing across multiple countries. Police pranking. Legend.</div>
+        </div>
+
+        <div class="bar-item" data-fill="100">
+            <div class="bar-label">
+                <span>Berfection Rating</span>
+                <span class="bar-percentage">100%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 100%;"></div></div>
+            <div class="bar-subtitle">Not perfect. Berfect. Mother fucking berfect.</div>
+        </div>
+
+        <div class="bar-item" data-fill="96">
+            <div class="bar-label">
+                <span>Adventure Drive</span>
+                <span class="bar-percentage">96%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 96%;"></div></div>
+            <div class="bar-subtitle">Greece. Sydney. WA. Couple rocks n dat.</div>
+        </div>
+
+        <div class="bar-item" data-fill="98">
+            <div class="bar-label">
+                <span>Confidence Index</span>
+                <span class="bar-percentage">98%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 98%;"></div></div>
+            <div class="bar-subtitle">She got a view of me... why was she complaining?</div>
+        </div>
+
+        <div class="bar-item" data-fill="100">
+            <div class="bar-label">
+                <span>Flawed Flawlessly</span>
+                <span class="bar-percentage">100%</span>
+            </div>
+            <div class="bar-bg"><div class="bar-fill" style="--fill-value: 100%;"></div></div>
+            <div class="bar-subtitle">It's literally tattooed. Case closed.</div>
+        </div>
+    </div>
+</section>
+
+<!-- SECTION 3: STARFIELD -->
+<section id="starfield">
+    <canvas id="starCanvas"></canvas>
+    <div class="starfield-content">
+        <div class="starfield-header">
+            <h2>THE UNIVERSE OF TAHINI</h2>
+            <p class="starfield-subtitle">click a star to discover a truth</p>
+        </div>
+    </div>
+</section>
+
+<!-- Modal Overlay and Card -->
+<div class="modal-overlay" id="modalOverlay"></div>
+<div class="star-modal hidden" id="starModal">
+    <button class="modal-close" id="modalClose">×</button>
+    <div id="starImageSlot" style="display:none; width:100%; height:200px; border-radius:12px; margin-bottom:15px; background-image:url('images/parthenon.jpg'); background-color:linear-gradient(135deg, #5BB5C6 0%, #B5C99A 100%); background-size:cover; background-position:center; border:1px solid rgba(255,255,255,0.1);">
+    </div>
+    <h3 id="starTitle"></h3>
+    <p id="starDescription"></p>
+</div>
+
+<!-- SECTION 4: QUIZ -->
+<section id="quiz">
+    <div class="quiz-header">
+        <h2>THE TAHINI ALGORITHM</h2>
+        <p class="quiz-subtitle">answer honestly... or don't, it doesn't matter</p>
+    </div>
+    <div class="quiz-container">
+        <div class="question-card" id="questionCard">
+            <div class="question-number" id="questionNumber"></div>
+            <div class="question-text" id="questionText"></div>
+            <div class="answers" id="answersContainer"></div>
+        </div>
+        <div class="result-text" id="resultText"></div>
+    </div>
+</section>
+
+<!-- SECTION 5: VERDICT -->
+<section id="verdict">
+    <div class="verdict-particles" id="verdictParticles"></div>
+    <div class="verdict-content">
+        <div class="verdict-label" id="verdictLabel"></div>
+        <div class="verdict-result" id="verdictResult"></div>
+        <div class="verdict-subtitle" id="verdictSubtitle"></div>
+        <div class="verdict-extra" id="verdictExtra"></div>
+    </div>
+</section>
+
+<!-- SECTION 6: GALLERY -->
+<section id="gallery">
+    <div class="gallery-header">
+        <h2>EVIDENCE FILE // CLASSIFIED</h2>
+        <p class="gallery-subtitle">photographic proof of berfection</p>
+    </div>
+    <div class="gallery-grid" id="galleryGrid"></div>
+</section>
+
+<script>
+    // ============ TERMINAL EFFECT ============
+    const terminalContent = document.getElementById('terminalContent');
+    const cursor = document.getElementById('cursor');
+    const beginBtn = document.getElementById('beginBtn');
+
+    const terminalText = `> INITIALIZING TAHINI VALIDATION SYSTEM v2.0...
+> Loading personality_matrix.exe...
+> Calibrating berfection_detector...
+> WARNING: Unprecedented levels of shenanigans detected
+> Bread obsession module: LOADED
+> Pole climbing proficiency: OFF THE CHARTS
+> Police encounter probability: EXTREMELY HIGH
+> System status: Ready to validate
+>
+> Subject detected: TAHINI
+> Beginning comprehensive inner beauty scan...`;
+
+    let charIndex = 0;
+    let lineIndex = 0;
+    const lines = terminalText.split('\n');
+
+    function typeTerminal() {
+        if (lineIndex < lines.length) {
+            if (charIndex < lines[lineIndex].length) {
+                terminalContent.innerHTML += lines[lineIndex][charIndex];
+                charIndex++;
+                setTimeout(typeTerminal, 30);
+            } else {
+                terminalContent.innerHTML += '\n';
+                charIndex = 0;
+                lineIndex++;
+                setTimeout(typeTerminal, 50);
+            }
+        } else {
+            cursor.style.display = 'none';
+            beginBtn.style.display = 'block';
+        }
+    }
+
+    typeTerminal();
+
+    // ============ SCROLL TO SCAN SECTION ============
+    beginBtn.addEventListener('click', () => {
+        document.getElementById('scan').scrollIntoView({ behavior: 'smooth' });
+    });
+
+    // ============ INTERSECTION OBSERVER FOR BARS ============
+    const observerOptions = { threshold: 0.3 };
+    const barObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                entry.target.classList.add('visible');
+            }
+        });
+    }, observerOptions);
+
+    document.querySelectorAll('.bar-item').forEach(item => {
+        barObserver.observe(item);
+    });
+
+    // ============ FLOATING PARTICLES ============
+    function createParticles(container, count = 15) {
+        for (let i = 0; i < count; i++) {
+            const particle = document.createElement('div');
+            particle.className = 'particle';
+            particle.style.left = Math.random() * 100 + '%';
+            particle.style.top = Math.random() * 100 + '%';
+            particle.style.animationDelay = Math.random() * 6 + 's';
+            container.appendChild(particle);
+        }
+    }
+
+    const scanParticles = document.getElementById('scanParticles');
+    createParticles(scanParticles, 20);
+
+    // ============ STARFIELD CANVAS ============
+    const starCanvas = document.getElementById('starCanvas');
+    const ctx = starCanvas.getContext('2d');
+
+    function resizeCanvas() {
+        starCanvas.width = window.innerWidth;
+        starCanvas.height = document.getElementById('starfield').offsetHeight;
+    }
+    resizeCanvas();
+    window.addEventListener('resize', () => {
+        resizeCanvas();
+        initStars(); // Recalculate star positions on resize
+    });
+
+    // Star data
+    const starData = [
+        { title: 'The Parthenon Expert', desc: 'One of the 7 wonders of the world and the Acropolis', hasImage: true },
+        { title: 'The Bread Whisperer', desc: 'Can identify bread types at 50 metres. Will judge your seed selection. Has opinions about gluten' },
+        { title: 'International Pole Athlete', desc: 'Has climbed poles in at least 2 countries. Signature move: The Crucifix. Street signs fear her' },
+        { title: 'Professional Police Liaison', desc: 'Has been pulled over, pranked cops. If I was a cop, I would pull her over just to get a look' },
+        { title: 'Chaos Coordinator', desc: 'Sorry I\'m late, I was arguing with the bitch that wouldn\'t let me bring in jungle juice' },
+        { title: 'Geese Translator', desc: '[geese honking]. Berfection.' },
+        { title: 'Flawed Flawlessly', desc: 'Being berfect.' }
+    ];
+
+    let stars = [];
+
+    function initStars() {
+        stars = [];
+        const w = starCanvas.width;
+        const h = starCanvas.height;
+        // Title area is roughly top 20% — keep stars below that
+        // Place stars in a deliberate grid pattern with some randomness
+        // so they're spaced out and never overlap the header text
+        const titleZoneBottom = h * 0.25;
+        const bottomPadding = 80;
+        const sidePadding = 60;
+        const usableW = w - sidePadding * 2;
+        const usableH = h - titleZoneBottom - bottomPadding;
+        const count = starData.length; // 7 stars
+
+        // Layout: 3 columns, spread across rows below the title
+        const positions = [
+            // Row 1: 3 stars spread wide
+            { col: 0.15, row: 0.1 },
+            { col: 0.5,  row: 0.05 },
+            { col: 0.85, row: 0.12 },
+            // Row 2: 2 stars
+            { col: 0.25, row: 0.45 },
+            { col: 0.75, row: 0.42 },
+            // Row 3: 2 stars
+            { col: 0.35, row: 0.78 },
+            { col: 0.65, row: 0.82 },
+        ];
+
+        const colors = ['#F4A0B0', '#F4A460', '#5BB5C6', '#E8849A', '#ff6b9d', '#F4A0B0', '#FFF8F0'];
+
+        starData.forEach((data, index) => {
+            const pos = positions[index];
+            // Add a little random jitter so it doesn't look too perfect
+            const jitterX = (Math.random() - 0.5) * 40;
+            const jitterY = (Math.random() - 0.5) * 30;
+            const x = sidePadding + pos.col * usableW + jitterX;
+            const y = titleZoneBottom + pos.row * usableH + jitterY;
+            const radius = 9 + Math.random() * 3;
+            stars.push({
+                x, y, radius, color: colors[index % 7], data,
+                pulsePhase: Math.random() * Math.PI * 2, clickRadius: 35
+            });
+        });
+    }
+
+    initStars();
+
+    function drawStars() {
+        ctx.clearRect(0, 0, starCanvas.width, starCanvas.height);
+
+        // Background stars
+        for (let i = 0; i < 100; i++) {
+            const x = (i * 73) % starCanvas.width;
+            const y = (i * 127) % starCanvas.height;
+            ctx.fillStyle = `rgba(255, 255, 255, ${0.3 + Math.sin(i + Date.now() / 2000) * 0.3})`;
+            ctx.beginPath();
+            ctx.arc(x, y, 1, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Main stars with glow
+        stars.forEach(star => {
+            const pulse = Math.sin(Date.now() / 1000 + star.pulsePhase) * 0.3 + 0.7;
+            const glowRadius = star.radius + 15 * pulse;
+
+            // Glow
+            const gradient = ctx.createRadialGradient(star.x, star.y, star.radius, star.x, star.y, glowRadius);
+            gradient.addColorStop(0, star.color + 'aa');
+            gradient.addColorStop(1, star.color + '00');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, glowRadius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Core
+            ctx.fillStyle = star.color;
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Label below the star
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+            ctx.font = '11px -apple-system, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(star.data.title, star.x, star.y + star.radius + 18);
+        });
+
+        requestAnimationFrame(drawStars);
+    }
+
+    drawStars();
+
+    // Star click handling (mouse + touch)
+    function handleStarTap(clientX, clientY) {
+        const rect = starCanvas.getBoundingClientRect();
+        const scaleX = starCanvas.width / rect.width;
+        const scaleY = starCanvas.height / rect.height;
+        const x = (clientX - rect.left) * scaleX;
+        const y = (clientY - rect.top) * scaleY;
+
+        stars.forEach(star => {
+            const dist = Math.sqrt((x - star.x) ** 2 + (y - star.y) ** 2);
+            if (dist < star.clickRadius) {
+                showStarModal(star.data);
+            }
+        });
+    }
+
+    starCanvas.addEventListener('click', (e) => {
+        handleStarTap(e.clientX, e.clientY);
+    });
+
+    starCanvas.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        const touch = e.changedTouches[0];
+        handleStarTap(touch.clientX, touch.clientY);
+    }, { passive: false });
+
+    // Modal management
+    const modalOverlay = document.getElementById('modalOverlay');
+    const starModal = document.getElementById('starModal');
+    const modalClose = document.getElementById('modalClose');
+
+    function showStarModal(data) {
+        document.getElementById('starTitle').textContent = data.title;
+        document.getElementById('starDescription').textContent = data.desc;
+        const imageSlot = document.getElementById('starImageSlot');
+        if (data.hasImage) {
+            imageSlot.style.display = 'flex';
+        } else {
+            imageSlot.style.display = 'none';
+        }
+        starModal.classList.remove('hidden');
+        modalOverlay.classList.add('active');
+    }
+
+    function closeModal() {
+        starModal.classList.add('hidden');
+        modalOverlay.classList.remove('active');
+    }
+
+    modalClose.addEventListener('click', closeModal);
+    modalOverlay.addEventListener('click', closeModal);
+
+    // ============ QUIZ LOGIC ============
+    const quizData = [
+        {
+            question: "What's the ideal breakfast?",
+            answers: ['Sourdough toast, obviously', 'Protein bread with hemp and sprouted seeds', 'White bread... wait, FUCK IT\'S GLUTEN FREE', 'Brioche, anyway...'],
+            result: 'INCORRECT. The answer was NOTHING!'
+        },
+        {
+            question: 'You see a street pole at 2am. What do you do?',
+            answers: ['Walk past it like a normal person', 'Climb it immediately, no questions asked', 'Climb it AND name the move', 'Climb it in a different country for variety'],
+            result: 'The correct answer was B, C, and D. If you picked A, you\'re lying.'
+        },
+        {
+            question: 'A police officer approaches you. Your move?',
+            answers: ['High five them and ask for a selfie', 'Start explaining why you NEED the jungle juice', 'Pretend you don\'t speak English, only Greek', 'Climb the nearest pole to assert dominance'],
+            result: 'All valid strategies. Somehow she\'d get away with every single one. #shenanigans'
+        }
+    ];
+
+    let currentQuestion = 0;
+    const questionCard = document.getElementById('questionCard');
+    const resultText = document.getElementById('resultText');
+
+    function displayQuestion() {
+        const q = quizData[currentQuestion];
+        document.getElementById('questionNumber').textContent = `Question ${currentQuestion + 1} of ${quizData.length}`;
+        document.getElementById('questionText').textContent = q.question;
+
+        const answersContainer = document.getElementById('answersContainer');
+        answersContainer.innerHTML = '';
+
+        q.answers.forEach((answer, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'answer-btn';
+            btn.textContent = answer;
+            btn.addEventListener('click', () => {
+                resultText.textContent = '';
+                typeResult(q.result, () => {
+                    currentQuestion++;
+                    if (currentQuestion < quizData.length) {
+                        setTimeout(() => {
+                            questionCard.classList.remove('hidden');
+                            displayQuestion();
+                        }, 2500);
+                    } else {
+                        questionCard.classList.add('hidden');
+                        resultText.textContent = 'ALGORITHM COMPLETE. Processing...';
+                        setTimeout(() => {
+                            resultText.textContent = 'Result: You are... BERFECT. Better than berfect, actually. x';
+                            setTimeout(() => {
+                                document.getElementById('verdict').scrollIntoView({ behavior: 'smooth' });
+                            }, 2000);
+                        }, 2000);
+                    }
+                });
+                questionCard.classList.add('hidden');
+            });
+            answersContainer.appendChild(btn);
+        });
+    }
+
+    function typeResult(text, callback) {
+        let idx = 0;
+        resultText.classList.add('typing');
+
+        function typeChar() {
+            if (idx < text.length) {
+                resultText.textContent += text[idx];
+                idx++;
+                setTimeout(typeChar, 40);
+            } else {
+                resultText.classList.remove('typing');
+                if (callback) callback();
+            }
+        }
+        typeChar();
+    }
+
+    displayQuestion();
+
+    // ============ SPECIAL TEXT SCRAMBLE EFFECT ============
+    const RANDOM_CHARS = '_!X$0-+*#';
+
+    function getRandomChar(prevChar) {
+        let char;
+        do {
+            char = RANDOM_CHARS[Math.floor(Math.random() * RANDOM_CHARS.length)];
+        } while (char === prevChar);
+        return char;
+    }
+
+    function scrambleText(element, finalText, options = {}) {
+        const { speed = 25, delay = 0, onComplete = null, isLarge = false } = options;
+        const len = finalText.length;
+        let phase = 'phase1';
+        let step = 0;
+        let interval = null;
+
+        // Start with blank
+        element.innerHTML = '';
+        for (let i = 0; i < len; i++) {
+            const span = document.createElement('span');
+            span.className = 'scramble-char';
+            span.textContent = '\u00A0';
+            element.appendChild(span);
+        }
+
+        function runPhase1() {
+            const maxSteps = len * 2;
+            const currentLength = Math.min(step + 1, len);
+            const spans = element.querySelectorAll('.scramble-char');
+
+            for (let i = 0; i < currentLength; i++) {
+                const prevChar = i > 0 ? spans[i - 1].textContent : undefined;
+                spans[i].textContent = getRandomChar(prevChar);
+                spans[i].className = 'scramble-char random';
+            }
+            for (let i = currentLength; i < len; i++) {
+                spans[i].textContent = '\u00A0';
+                spans[i].className = 'scramble-char';
+            }
+
+            step++;
+            if (step >= maxSteps) {
+                phase = 'phase2';
+                step = 0;
+            }
+        }
+
+        function runPhase2() {
+            const revealedCount = Math.floor(step / 2);
+            const spans = element.querySelectorAll('.scramble-char');
+
+            for (let i = 0; i < revealedCount && i < len; i++) {
+                spans[i].textContent = finalText[i] === ' ' ? '\u00A0' : finalText[i];
+                spans[i].className = 'scramble-char revealed';
+            }
+
+            if (revealedCount < len) {
+                if (step % 2 === 0) {
+                    spans[revealedCount].textContent = '_';
+                    spans[revealedCount].className = 'scramble-char cursor-char';
+                } else {
+                    spans[revealedCount].textContent = getRandomChar();
+                    spans[revealedCount].className = 'scramble-char random';
+                }
+            }
+
+            for (let i = Math.max(revealedCount + 1, 0); i < len; i++) {
+                spans[i].textContent = getRandomChar();
+                spans[i].className = 'scramble-char random';
+            }
+
+            step++;
+            if (step >= len * 2) {
+                // Final reveal
+                for (let i = 0; i < len; i++) {
+                    spans[i].textContent = finalText[i] === ' ' ? '\u00A0' : finalText[i];
+                    spans[i].className = 'scramble-char revealed';
+                }
+                clearInterval(interval);
+                if (onComplete) onComplete();
+            }
+        }
+
+        setTimeout(() => {
+            interval = setInterval(() => {
+                if (phase === 'phase1') runPhase1();
+                else runPhase2();
+            }, speed);
+        }, delay);
+    }
+
+    // ============ VERDICT ANIMATION SEQUENCE ============
+    const verdictSection = document.getElementById('verdict');
+    const verdictLabel = document.getElementById('verdictLabel');
+    const verdictResult = document.getElementById('verdictResult');
+    const verdictSubtitle = document.getElementById('verdictSubtitle');
+    const verdictExtra = document.getElementById('verdictExtra');
+    let verdictTriggered = false;
+
+    const verdictObserver = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting && !verdictTriggered) {
+                verdictTriggered = true;
+
+                // Phase 1: Scramble in "SYSTEM VERDICT:"
+                verdictLabel.classList.add('visible');
+                scrambleText(verdictLabel, 'SYSTEM VERDICT:', {
+                    speed: 30,
+                    delay: 300,
+                    onComplete: () => {
+                        // Phase 2: Scramble in "BERFECT" (big, dramatic, slower)
+                        scrambleText(verdictResult, 'BERFECT', {
+                            speed: 45,
+                            delay: 400,
+                            onComplete: () => {
+                                // Phase 3: Fade in subtitle
+                                setTimeout(() => {
+                                    verdictSubtitle.textContent = 'better than berfect x';
+                                    verdictSubtitle.classList.add('visible');
+                                }, 300);
+
+                                // Phase 4: Scramble in the extra text
+                                setTimeout(() => {
+                                    verdictExtra.classList.add('visible');
+                                    scrambleText(verdictExtra, "Don't say it... don't say... mother fucking Berfect", {
+                                        speed: 18,
+                                        delay: 0
+                                    });
+                                }, 1200);
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }, { threshold: 0.3 });
+
+    verdictObserver.observe(verdictSection);
+
+    // ============ VERDICT PARTICLES ============
+    const verdictParticles = document.getElementById('verdictParticles');
+    createParticles(verdictParticles, 50);
+
+    // Floating text animation in verdict
+    const floatingTexts = [
+        '#shenanigans', '#trophywife', '#meowmeowmeowmeow', '#sleigh',
+        'couple rocks n dat', '[geese honking]', 'Don\'t ever put me in a situation', 'Hail o\'dictator'
+    ];
+
+    function addFloatingText() {
+        const text = floatingTexts[Math.floor(Math.random() * floatingTexts.length)];
+        const div = document.createElement('div');
+        div.className = 'floating-text';
+        div.textContent = text;
+        div.style.left = Math.random() * 80 + '%';
+        div.style.top = Math.random() * 60 + '%';
+        div.style.animationDelay = Math.random() * 2 + 's';
+        verdictParticles.appendChild(div);
+
+        setTimeout(() => div.remove(), 10000);
+    }
+
+    setInterval(addFloatingText, 1500);
+
+    // ============ GALLERY ============
+    const galleryData = [
+        { label: 'Exhibit A', title: 'The Parthenon', image: 'images/parthenon.jpg', color: 'linear-gradient(135deg, #5BB5C6 0%, #B5C99A 100%)' },
+        { label: 'Exhibit B', title: 'Ball Pit Chaos', image: 'images/ballpit-face.jpg', color: 'linear-gradient(135deg, #F4A0B0 0%, #ff6b9d 100%)' },
+        { label: 'Exhibit C', title: 'Ball Pit Takeover', image: 'images/ballpit-full.jpg', color: 'linear-gradient(135deg, #ff6b9d 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit D', title: 'Pole Climbing Championship', image: 'images/pole-climb-aus.jpg', color: 'linear-gradient(135deg, #F4A460 0%, #E8849A 100%)' },
+        { label: 'Exhibit E', title: 'The Crucifix', image: 'images/crucifix-greece.jpg', color: 'linear-gradient(135deg, #E8849A 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit F', title: 'Cow Whispering', image: 'images/cow-selfie.jpg', color: 'linear-gradient(135deg, #B5C99A 0%, #F4A460 100%)' },
+        { label: 'Exhibit G', title: 'Quokka Diplomacy', image: 'images/quokka.jpg', color: 'linear-gradient(135deg, #5BB5C6 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit H', title: 'Pink Corset Era', image: 'images/pink-corset.jpg', color: 'linear-gradient(135deg, #ff6b9d 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit I', title: 'Beach Thumbs Up', image: 'images/beach-thumbsup.jpg', color: 'linear-gradient(135deg, #F4A460 0%, #5BB5C6 100%)' },
+        { label: 'Exhibit J', title: 'Olive Branch Diplomacy', image: 'images/olive-branch.jpg', color: 'linear-gradient(135deg, #B5C99A 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit K', title: 'Party Animal', image: 'images/party-arm-up.jpg', color: 'linear-gradient(135deg, #E8849A 0%, #ff6b9d 100%)' },
+        { label: 'Exhibit L', title: 'Pink Eyeshadow Era', image: 'images/pink-eyeshadow.jpg', color: 'linear-gradient(135deg, #F4A0B0 0%, #E8849A 100%)' },
+        { label: 'Exhibit M', title: 'Phone Number Secured', image: 'images/phone-number.jpg', color: 'linear-gradient(135deg, #F4A460 0%, #FFF8F0 100%)' },
+        { label: 'Exhibit N', title: 'Car Vibes', image: 'images/car-peace.jpg', color: 'linear-gradient(135deg, #5BB5C6 0%, #B5C99A 100%)' },
+        { label: 'Exhibit O', title: 'Mic Drop', image: 'images/microphone.jpg', color: 'linear-gradient(135deg, #F4A0B0 0%, #ff6b9d 100%)' },
+        { label: 'Exhibit P', title: 'The Ali Barbar Upload', image: 'images/ali-barbar.jpg', color: 'linear-gradient(135deg, #E8849A 0%, #F4A460 100%)' },
+        { label: 'Exhibit Q', title: 'Pranked Youz', image: 'images/pranked-police.jpg', color: 'linear-gradient(135deg, #ff6b9d 0%, #F4A460 100%)' },
+        { label: 'Exhibit R', title: 'Crystal Clear', image: 'images/ocean-hearts.jpg', color: 'linear-gradient(135deg, #5BB5C6 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit S', title: 'Duckling Hat Designer', image: 'images/duckling-hat.jpg', color: 'linear-gradient(135deg, #F4A460 0%, #FFF8F0 100%)' },
+        { label: 'Exhibit T', title: 'Shiba With a Bow', image: 'images/shiba-bow.jpg', color: 'linear-gradient(135deg, #E8849A 0%, #F4A0B0 100%)' },
+        { label: 'Exhibit U', title: 'Ketchup Dog', image: 'images/ketchup-dog.jpg', color: 'linear-gradient(135deg, #F4A460 0%, #E8849A 100%)' },
+        { label: 'Exhibit V', title: 'Hands Up at the Taxi', image: 'images/hands-up-taxi.jpg', color: 'linear-gradient(135deg, #F4A0B0 0%, #ff6b9d 100%)' },
+        { label: 'Exhibit W', title: 'Ball Pit Submerged', image: 'images/ballpit-submerged.jpg', color: 'linear-gradient(135deg, #ff6b9d 0%, #E8849A 100%)' }
+    ];
+
+    const galleryGrid = document.getElementById('galleryGrid');
+
+    galleryData.forEach((item, idx) => {
+        const card = document.createElement('div');
+        card.className = 'gallery-card';
+        card.style.background = item.color;
+        card.style.animationDelay = (idx * 0.1) + 's';
+
+        // If image exists, load it as background
+        if (item.image) {
+            const img = new Image();
+            img.onload = function() {
+                card.style.backgroundImage = `url('${item.image}')`;
+                card.style.backgroundSize = 'cover';
+                card.style.backgroundPosition = 'center';
+                card.classList.add('has-image');
+            };
+            img.src = item.image;
+        }
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        observer.observe(card);
+
+        card.innerHTML = `
+            <div class="gallery-card-overlay">
+                <div class="gallery-label">${item.label}</div>
+                <div class="gallery-description">${item.title}</div>
+            </div>
+        `;
+
+        galleryGrid.appendChild(card);
+    });
+
+</script>
+
+</body>
+</html>
